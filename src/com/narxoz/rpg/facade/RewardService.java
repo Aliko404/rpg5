@@ -2,10 +2,24 @@ package com.narxoz.rpg.facade;
 
 public class RewardService {
     public String determineReward(AdventureResult battleResult) {
-        // TODO: Decide reward rules based on battle outcome.
         if (battleResult == null) {
-            return "TODO";
+            return "no loot";
         }
-        return "TODO";
+
+        if ("Hero".equals(battleResult.getWinner())) {
+            if (battleResult.getRounds() <= 3) {
+                return "legendary chest";
+            }
+            if (battleResult.getRounds() <= 6) {
+                return "epic chest";
+            }
+            return "gold and potion";
+        }
+
+        if ("Boss".equals(battleResult.getWinner())) {
+            return "respawn and sadness";
+        }
+
+        return "small consolation loot";
     }
 }

@@ -15,21 +15,62 @@ public class BattleService {
     }
 
     public AdventureResult battle(HeroProfile hero, BossEnemy boss, AttackAction action) {
-        // TODO: Implement the battle flow.
-        // Questions to answer:
-        // - Who attacks first?
-        // - How many rounds are allowed?
-        // - How is damage resolved?
-        // - How will randomness affect the result, if at all?
         AdventureResult result = new AdventureResult();
-        result.setWinner("TODO");
-        result.setRounds(0);
-        result.setReward("TODO");
-        result.addLine("TODO: implement battle logic");
 
-        // Keep the field in use so students can decide whether to rely on it.
-        if (random.nextInt(1) == 0) {
-            // TODO: Replace placeholder branch with real deterministic or random logic.
+        if (hero == null || boss == null || action == null) {
+            result.setWinner("Nobody");
+            result.setRounds(0);
+            result.setReward("no loot");
+            result.addLine("battle can't start, stuff is missing");
+            return result;
+        }
+
+        int rounds = 0;
+        int maxRounds = 10;
+
+        result.addLine("battle starts");
+        result.addLine(hero.getName() + " uses " + action.getActionName());
+        result.addLine("effects: " + action.getEffectSummary());
+
+        while (hero.isAlive() && boss.isAlive() && rounds < maxRounds) {
+            rounds++;
+            result.addLine("round " + rounds);
+
+            int heroDamage = action.getDamage();
+            boolean heroCrit = random.nextInt(100) < 20;
+            if (heroCrit) {
+                heroDamage += 5;
+                result.addLine(hero.getName() + " lands a spicy crit");
+            }
+
+            boss.takeDamage(heroDamage);
+            result.addLine(hero.getName() + " hits " + boss.getName() + " for " + heroDamage);
+            result.addLine(boss.getName() + " hp: " + boss.getHealth());
+
+            if (!boss.isAlive()) {
+                break;
+            }
+
+            int bossDamage = boss.getAttackPower();
+            boolean bossCrit = random.nextInt(100) < 15;
+            if (bossCrit) {
+                bossDamage += 4;
+                result.addLine(boss.getName() + " goes wild with a heavy hit");
+            }
+
+            hero.takeDamage(bossDamage);
+            result.addLine(boss.getName() + " hits " + hero.getName() + " for " + bossDamage);
+            result.addLine(hero.getName() + " hp: " + hero.getHealth());
+        }
+
+        result.setRounds(rounds);
+
+        if (hero.isAlive() && !boss.isAlive()) {
+            result.setWinner("Hero");
+        } else if (!hero.isAlive() && boss.isAlive()) {
+            result.setWinner("Boss");
+        } else {
+            result.setWinner("Draw");
         }
 
         return result;
